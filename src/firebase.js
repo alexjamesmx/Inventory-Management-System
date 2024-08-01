@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getDoc, setDoc, doc, collection } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,4 +14,30 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
-export { firestore };
+const auth = getAuth(app);
+
+async function userExists(uid) {
+  const docRef = doc(firestore, "users", uid);
+  const res = await getDoc(docRef);
+  return res.exists();
+}
+
+async function registerNewUser(user) {
+  try {
+    const collectionRef = collection(firestore, "users");
+    const docRef = doc(collectionRef, user.uid);
+    await setDoc(docRef, user);
+  } catch (error) {}
+}
+
+async function getUserInfo(uid) {
+  try {
+    const docRef = doc(firestore, "users", uid);
+    const document = await getDoc(docRef);
+    return document.data();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export { firestore, auth, userExists, registerNewUser, getUserInfo };

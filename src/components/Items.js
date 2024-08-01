@@ -4,17 +4,26 @@ import { useRouter } from "next/navigation";
 import { Box, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { firestore } from "@/firebase";
-import { doc, updateDoc, increment, deleteDoc } from "firebase/firestore";
+import { auth, firestore } from "@/firebase";
+import {
+  doc,
+  updateDoc,
+  increment,
+  deleteDoc,
+  collection,
+} from "firebase/firestore";
 
-export default function Items({ items, setItems }) {
+export default function Items({ items, setItems, fetching }) {
   const router = useRouter();
+  const [user, setUser] = useState(auth.currentUser);
 
   const handleAdd = async (item, index) => {
     try {
-      await updateDoc(doc(firestore, "items", item.id), {
-        quantity: increment(1),
-      });
+      console.log("user", user);
+      const docRef = doc(firestore, "users", user.uid);
+      const itemsRef = collection(docRef, "items");
+      const itemRef = doc(itemsRef, item.id);
+      await updateDoc(itemRef, { quantity: increment(1) });
 
       setItems((prevItems) => {
         const newItems = [...prevItems];
@@ -30,9 +39,10 @@ export default function Items({ items, setItems }) {
     if (await isQuantityZero(item)) return;
 
     try {
-      await updateDoc(doc(firestore, "items", item.id), {
-        quantity: increment(-1),
-      });
+      const docRef = doc(firestore, "users", user.uid);
+      const itemsRef = collection(docRef, "items");
+      const itemRef = doc(itemsRef, item.id);
+      await updateDoc(itemRef, { quantity: increment(-1) });
 
       setItems((prevItems) => {
         const newItems = [...prevItems];
@@ -58,6 +68,29 @@ export default function Items({ items, setItems }) {
     }
     return false;
   };
+
+  if (fetching) {
+    return (
+      <Box
+        width="100%"
+        height="100px"
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+        bgcolor={"#f0f0f0"}
+        position={"relative"}
+      >
+        <Typography
+          variant={"h4"}
+          color={"#333"}
+          textAlign={"center"}
+          fontWeight={"bold"}
+        >
+          Loading
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
     <>

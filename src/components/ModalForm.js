@@ -17,6 +17,8 @@ import { addDoc, collection } from "firebase/firestore";
 import { firestore } from "@/firebase";
 import { toast } from "react-toastify";
 import { Camera } from "react-camera-pro";
+import { auth } from "@/firebase";
+import { doc } from "firebase/firestore";
 
 // Custom TabPanel Component
 function TabPanel(props) {
@@ -42,6 +44,7 @@ export function ModalForm({ open, handleClose, items }) {
   const [cameraError, setCameraError] = useState(null);
   const camera = useRef(null);
   const [isCameraAccessible, setIsCameraAccessible] = useState(false);
+  const [user, setUser] = useState(auth.currentUser);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -53,14 +56,18 @@ export function ModalForm({ open, handleClose, items }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await addDoc(collection(firestore, "items"), {
-        name: itemName,
-        quantity: 1,
-      });
-      setItemName("");
-      handleClose();
-      items.push({ name: itemName, quantity: 1 });
-      toast.success("Item added successfully");
+      if (user) {
+        // Correct structure: Collection -> Document -> Sub-collection
+        const userDocRef = doc(firestore, "users", user.uid);
+        const itemsCollectionRef = collection(userDocRef, "items");
+        await addDoc(itemsCollectionRef, {
+          name: itemName,
+          quantity: 1,
+        });
+        setItemName("");
+        handleClose();
+        toast.success("Item added successfully");
+      }
     } catch (error) {
       console.error("Error adding item:", error);
       toast.error("Failed to add item");
