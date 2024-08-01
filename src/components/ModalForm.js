@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { Camera } from "react-camera-pro";
 import { auth } from "@/firebase";
 import { doc } from "firebase/firestore";
+import { FineTuningJobCheckpointsPage } from "openai/resources/fine-tuning/jobs/checkpoints";
 
 // Custom TabPanel Component
 function TabPanel(props) {
@@ -85,21 +86,24 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
 
   useEffect(() => {
     if (open) {
-      // Check if camera is accessible
-      if (hasUserMedia()) {
-        setIsCameraAccessible(true);
-      } else {
-        setIsCameraAccessible(false);
-      }
+      // Check if camera is accessibl, use promise to handle async
+      hasUserMedia().then((result) => {
+        setIsCameraAccessible(result);
+        console.log("result", result);
+      });
     }
-  }, []);
-  function hasUserMedia() {
-    navigator.getUserMedia =
-      navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia;
-    return !!navigator.getUserMedia;
+  }, [open]);
+  async function hasUserMedia() {
+    return navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then(() => {
+        console.log("Webcam is accessible");
+        return true;
+      })
+      .catch(() => {
+        console.log("Webcam is not accessible");
+        return false;
+      });
   }
   useEffect(() => {
     if (image) {
