@@ -75,19 +75,21 @@ export function ModalForm({ open, handleClose, items }) {
   };
 
   useEffect(() => {
-    navigator.getUserMedia(
-      {
-        video: true,
-      },
-      () => {
-        console.log("has webcam");
-        setIsCameraAccessible(true);
-      },
-      () => {
-        console.log("no webcam");
-        setIsCameraAccessible(false);
-      }
-    );
+    if (open) {
+      navigator.getUserMedia(
+        {
+          video: true,
+        },
+        () => {
+          console.log("has webcam");
+          setIsCameraAccessible(true);
+        },
+        () => {
+          console.log("no webcam");
+          setIsCameraAccessible(false);
+        }
+      );
+    }
   }, []);
 
   return (
@@ -172,8 +174,7 @@ export function ModalForm({ open, handleClose, items }) {
           <TabPanel value={value} index={1}>
             {!isCameraAccessible ? (
               <Typography color="error" variant="body1">
-                No camera device accessible. Please connect your camera or try
-                a.
+                No camera device accessible. Please connect your camera.
               </Typography>
             ) : (
               <>
