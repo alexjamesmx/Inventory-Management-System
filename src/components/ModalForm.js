@@ -20,6 +20,7 @@ import { Camera } from "react-camera-pro";
 import { auth } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { FineTuningJobCheckpointsPage } from "openai/resources/fine-tuning/jobs/checkpoints";
+import { Image } from "@mui/icons-material";
 
 // Custom TabPanel Component
 function TabPanel(props) {
@@ -108,16 +109,9 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
   useEffect(() => {
     if (image) {
       // pass image to openai api
-      console.log("image", image);
+      console.log("photo taken image", image);
     }
   }, [image]);
-
-  const handleSubmitPhotoTaken = () => {
-    //get image data, create the url and upload it to storage, also set the url on the item object
-    const data = camera.current.getDataUri();
-    setImage(data);
-    console.log("data", data);
-  };
 
   const CameraComponent = () => {
     if (isCameraAccessible === 0) {
@@ -127,6 +121,7 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
       // accessible
       return (
         <>
+          <Image src={image} alt="image Preview" />
           <Camera
             ref={camera}
             onError={handleCameraError}
