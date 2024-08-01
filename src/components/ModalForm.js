@@ -112,9 +112,11 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
     }
   }, [image]);
 
-  const handleSubmitPhotoTaken = (dataUri) => {
+  const handleSubmitPhotoTaken = () => {
     //get image data, create the url and upload it to storage, also set the url on the item object
-    console.log("dataUri", dataUri);
+    const data = camera.current.getDataUri();
+    setImage(data);
+    console.log("data", data);
   };
 
   const CameraComponent = () => {
@@ -151,6 +153,7 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
             color="primary"
             onClick={() => {
               camera.current.takePhoto();
+              handleSubmitPhotoTaken();
             }}
             sx={{ marginTop: 2 }}
           >
