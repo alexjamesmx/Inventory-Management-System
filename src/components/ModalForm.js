@@ -44,7 +44,7 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
   const [image, setImage] = useState(null);
   const [cameraError, setCameraError] = useState(null);
   const camera = useRef(null);
-  const [isCameraAccessible, setIsCameraAccessible] = useState(false);
+  const [isCameraAccessible, setIsCameraAccessible] = useState(0);
   const [user, setUser] = useState(auth.currentUser);
 
   const handleChange = (event, newValue) => {
@@ -98,11 +98,11 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
       .getUserMedia({ video: true })
       .then(() => {
         console.log("Webcam is accessible");
-        return true;
+        return 1;
       })
       .catch(() => {
         console.log("Webcam is not accessible");
-        return false;
+        return 2;
       });
   }
   useEffect(() => {
@@ -111,6 +111,53 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
       console.log("image", image);
     }
   }, [image]);
+
+  const CameraComponent = () => {
+    if (isCameraAccessible === 0) {
+      // loading
+      return <Typography variant="body1">Loading...</Typography>;
+    } else if (isCameraAccessible === 1) {
+      // accessible
+      return (
+        <Camera
+          ref={camera}
+          onError={handleCameraError}
+          errorMessages={{
+            noCameraAccessible:
+              "No camera device accessible. Please connect your camera or try a different browser.",
+            permissionDenied:
+              "Permission denied. Please refresh and give camera permission.",
+            switchCamera:
+              "It is not possible to switch the camera to a different one because there is only one video device accessible.",
+            canvas: "Canvas is not supported.",
+            unknown: "An unknown error occurred while accessing the camera.",
+          }}
+        />
+      );
+    } else {
+      // not accessible
+      return (
+        <Box sx={{ textAlign: "center" }}>
+          <Typography color="error" variant="body1">
+            No camera device accessible. Please connect your camera.
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setIsCameraAccessible(0);
+              hasUserMedia().then((result) => {
+                setIsCameraAccessible(result);
+              });
+            }}
+            sx={{ marginTop: 2 }}
+          >
+            Retry
+          </Button>
+        </Box>
+      );
+    }
+  };
 
   return (
     <Modal
@@ -192,46 +239,10 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
           </TabPanel>
 
           <TabPanel value={value} index={1}>
-            {!isCameraAccessible ? (
-              <Typography color="error" variant="body1">
-                No camera device accessible. Please connect your camera.
-              </Typography>
-            ) : (
-              <>
-                <Camera
-                  ref={camera}
-                  onError={handleCameraError}
-                  errorMessages={{
-                    noCameraAccessible:
-                      "No camera device accessible. Please connect your camera or try a different browser.",
-                    permissionDenied:
-                      "Permission denied. Please refresh and give camera permission.",
-                    switchCamera:
-                      "It is not possible to switch the camera to a different one because there is only one video device accessible.",
-                    canvas: "Canvas is not supported.",
-                    unknown:
-                      "An unknown error occurred while accessing the camera.",
-                  }}
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ marginBottom: 20 }}
-                  onClick={() => {
-                    try {
-                      if (camera.current) {
-                        const image = camera.current.takePhoto();
-                        setImage(image);
-                      }
-                    } catch (error) {
-                      handleCameraError(error);
-                    }
-                  }}
-                >
-                  Take Photo
-                </Button>
-              </>
-            )}
+            <Typography variant="h4" gutterBottom>
+              Post an item with a photo
+            </Typography>
+            <CameraComponent />
           </TabPanel>
         </Box>
       </Fade>
