@@ -124,23 +124,39 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
     } else if (isCameraAccessible === 1) {
       // accessible
       return (
-        <Camera
-          ref={camera}
-          onError={handleCameraError}
-          errorMessages={{
-            noCameraAccessible:
-              "No camera device accessible. Please connect your camera or try a different browser.",
-            permissionDenied:
-              "Permission denied. Please refresh and give camera permission.",
-            switchCamera:
-              "It is not possible to switch the camera to a different one because there is only one video device accessible.",
-            canvas: "Canvas is not supported.",
-            unknown: "An unknown error occurred while accessing the camera.",
-          }}
-          onTakePhoto={(dataUri) => {
-            handleSubmitPhotoTaken(dataUri);
-          }}
-        />
+        <>
+          <Camera
+            ref={camera}
+            onError={handleCameraError}
+            errorMessages={{
+              noCameraAccessible:
+                "No camera device accessible. Please connect your camera or try a different browser.",
+              permissionDenied:
+                "Permission denied. Please refresh and give camera permission.",
+              switchCamera:
+                "It is not possible to switch the camera to a different one because there is only one video device accessible.",
+              canvas: "Canvas is not supported.",
+              unknown: "An unknown error occurred while accessing the camera.",
+            }}
+          />
+
+          {cameraError && (
+            <Typography color="error" variant="body1">
+              {cameraError}
+            </Typography>
+          )}
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              camera.current.takePhoto();
+            }}
+            sx={{ marginTop: 2 }}
+          >
+            Take Photo
+          </Button>
+        </>
       );
     } else {
       // not accessible
