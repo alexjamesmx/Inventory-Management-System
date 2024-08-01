@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, use, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -41,6 +41,7 @@ export function ModalForm({ open, handleClose, items }) {
   const [image, setImage] = useState(null);
   const [cameraError, setCameraError] = useState(null);
   const camera = useRef(null);
+  const [isCameraAccessible, setIsCameraAccessible] = useState(false);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -72,6 +73,22 @@ export function ModalForm({ open, handleClose, items }) {
       error.message || "An unexpected error occurred with the camera."
     );
   };
+
+  useEffect(() => {
+    navigator.getUserMedia(
+      {
+        video: true,
+      },
+      () => {
+        console.log("has webcam");
+        setIsCameraAccessible(true);
+      },
+      () => {
+        console.log("no webcam");
+        setIsCameraAccessible(false);
+      }
+    );
+  }, []);
 
   return (
     <Modal
@@ -153,9 +170,10 @@ export function ModalForm({ open, handleClose, items }) {
           </TabPanel>
 
           <TabPanel value={value} index={1}>
-            {cameraError ? (
+            {!isCameraAccessible ? (
               <Typography color="error" variant="body1">
-                {cameraError}
+                No camera device accessible. Please connect your camera or try
+                a.
               </Typography>
             ) : (
               <>
