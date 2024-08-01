@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef, use, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -13,16 +13,11 @@ import {
   Tab,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { addDoc, collection } from "firebase/firestore";
-import { firestore } from "@/firebase";
+import { addDoc, collection, doc } from "firebase/firestore";
+import { firestore, auth } from "@/firebase";
 import { toast } from "react-toastify";
 import { Camera } from "react-camera-pro";
-import { auth } from "@/firebase";
-import { doc } from "firebase/firestore";
-import { FineTuningJobCheckpointsPage } from "openai/resources/fine-tuning/jobs/checkpoints";
-import { Image } from "@mui/icons-material";
 
-// Custom TabPanel Component
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -42,9 +37,9 @@ function TabPanel(props) {
 export function ModalForm({ open, handleClose, items, setRefresh }) {
   const [itemName, setItemName] = useState("");
   const [value, setValue] = useState(0);
-  const [image, setImage] = useState(null);
-  const [cameraError, setCameraError] = useState(null);
-  const camera = useRef(null);
+  const [image, setImage] = (useState < string) | (null > null);
+  const [cameraError, setCameraError] = (useState < string) | (null > null);
+  const camera = (useRef < Camera) | (null > null);
   const [isCameraAccessible, setIsCameraAccessible] = useState(0);
   const [user, setUser] = useState(auth.currentUser);
 
@@ -59,15 +54,15 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
     event.preventDefault();
     try {
       if (user) {
-        // Correct structure: Collection -> Document -> Sub-collection
         const userDocRef = doc(firestore, "users", user.uid);
         const itemsCollectionRef = collection(userDocRef, "items");
         await addDoc(itemsCollectionRef, {
           name: itemName,
           quantity: 1,
+          image: image, // Add the image URL to the document
         });
         setItemName("");
-        items.push({ name: itemName, quantity: 1 });
+        items.push({ name: itemName, quantity: 1, image });
         handleClose();
         setRefresh((prev) => !prev);
         toast.success("Item added successfully");
@@ -87,13 +82,13 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
 
   useEffect(() => {
     if (open) {
-      // Check if camera is accessibl, use promise to handle async
       hasUserMedia().then((result) => {
         setIsCameraAccessible(result);
         console.log("result", result);
       });
     }
   }, [open]);
+
   async function hasUserMedia() {
     return navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -106,24 +101,32 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
         return 2;
       });
   }
-  useEffect(() => {
-    if (image) {
-      // pass image to openai api
-      console.log("photo taken image", image);
-    }
-  }, [image]);
+
+  const handlePhotoTaken = (photo) => {
+    console.log("photo taken image", photo);
+    setImage(photo);
+  };
 
   const CameraComponent = () => {
     if (isCameraAccessible === 0) {
-      // loading
       return <Typography variant="body1">Loading...</Typography>;
     } else if (isCameraAccessible === 1) {
-      // accessible
       return (
-        <>
-          <Image src={image} alt="image Preview" />
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          width="100%"
+          height="100%"
+          bgcolor="background.paper"
+          p={4}
+          borderRadius={2}
+          boxShadow={24}
+        >
           <Camera
             ref={camera}
+            aspectRatio="cover"
             onError={handleCameraError}
             errorMessages={{
               noCameraAccessible:
@@ -136,27 +139,41 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
               unknown: "An unknown error occurred while accessing the camera.",
             }}
           />
-
           {cameraError && (
             <Typography color="error" variant="body1">
               {cameraError}
             </Typography>
           )}
-
           <Button
             variant="contained"
             color="primary"
             onClick={() => {
-              setImage(camera.current.takePhoto());
+              if (camera.current) {
+                const photo = camera.current.takePhoto();
+                handlePhotoTaken(photo);
+              }
             }}
             sx={{ marginTop: 2 }}
           >
             Take Photo
           </Button>
-        </>
+          {image && (
+            <Box
+              sx={{
+                width: 120,
+                height: 120,
+                backgroundImage: `url(${image})`,
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+                marginTop: 2,
+              }}
+              onClick={() => setImage(null)}
+            />
+          )}
+        </Box>
       );
     } else {
-      // not accessible
       return (
         <Box sx={{ textAlign: "center" }}>
           <Typography color="error" variant="body1">
