@@ -147,7 +147,7 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
             variant="contained"
             color="primary"
             onClick={() => {
-              camera.current.takePhoto();
+              setImage(camera.current.takePhoto());
             }}
             sx={{ marginTop: 2 }}
           >
