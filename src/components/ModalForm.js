@@ -148,7 +148,6 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
             color="primary"
             onClick={() => {
               camera.current.takePhoto();
-              handleSubmitPhotoTaken();
             }}
             sx={{ marginTop: 2 }}
           >
