@@ -92,6 +92,13 @@ export function ModalForm({ open, handleClose, items }) {
     }
   }, []);
 
+  useEffect(() => {
+    if (image) {
+      // pass image to openai api
+      console.log("image", image);
+    }
+  }, [image]);
+
   return (
     <Modal
       aria-labelledby="transition-modal-title"
