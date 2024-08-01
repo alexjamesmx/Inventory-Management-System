@@ -37,7 +37,7 @@ function TabPanel(props) {
   );
 }
 
-export function ModalForm({ open, handleClose, items }) {
+export function ModalForm({ open, handleClose, items, setRefresh }) {
   const [itemName, setItemName] = useState("");
   const [value, setValue] = useState(0);
   const [image, setImage] = useState(null);
@@ -65,7 +65,9 @@ export function ModalForm({ open, handleClose, items }) {
           quantity: 1,
         });
         setItemName("");
+        items.push({ name: itemName, quantity: 1 });
         handleClose();
+        setRefresh((prev) => !prev);
         toast.success("Item added successfully");
       }
     } catch (error) {
@@ -84,14 +86,21 @@ export function ModalForm({ open, handleClose, items }) {
   useEffect(() => {
     if (open) {
       // Check if camera is accessible
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      if (hasUserMedia()) {
         setIsCameraAccessible(true);
       } else {
         setIsCameraAccessible(false);
       }
     }
   }, []);
-
+  function hasUserMedia() {
+    navigator.getUserMedia =
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia;
+    return !!navigator.getUserMedia;
+  }
   useEffect(() => {
     if (image) {
       // pass image to openai api

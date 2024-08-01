@@ -37,6 +37,7 @@ export default function Home() {
   const [fetching, setFetching] = useState(true);
   const [message, setMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [refresh, setRefresh] = useState(false);
 
   const router = useRouter();
   const openai = new OpenAI({
@@ -54,7 +55,7 @@ export default function Home() {
         router.push("/login");
       }
     });
-  }, [router]);
+  }, [router, refresh]);
 
   async function getMessage() {
     const response = await openai.chat.completions.create({
@@ -137,7 +138,7 @@ export default function Home() {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ marginBottom: 20, width: "300px" }}
             />{" "}
-            <Add items={items} />
+            <Add items={items} setRefresh={setRefresh} />
           </Box>
           <Stack
             width="800px"

@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import { ModalForm } from "@/components/ModalForm";
 
-export function Add({ items }) {
+export function Add({ items, setRefresh }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -20,7 +20,12 @@ export function Add({ items }) {
       >
         Add
       </Button>
-      <ModalForm open={open} handleClose={handleClose} items />
+      <ModalForm
+        open={open}
+        handleClose={handleClose}
+        items={items}
+        setRefresh={setRefresh}
+      />
     </>
   );
 }
