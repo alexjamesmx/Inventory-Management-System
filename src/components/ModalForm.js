@@ -76,19 +76,12 @@ export function ModalForm({ open, handleClose, items }) {
 
   useEffect(() => {
     if (open) {
-      navigator.getUserMedia(
-        {
-          video: true,
-        },
-        () => {
-          console.log("has webcam");
-          setIsCameraAccessible(true);
-        },
-        () => {
-          console.log("no webcam");
-          setIsCameraAccessible(false);
-        }
-      );
+      // Check if camera is accessible
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        setIsCameraAccessible(true);
+      } else {
+        setIsCameraAccessible(false);
+      }
     }
   }, []);
 
