@@ -515,7 +515,6 @@ export function ModalForm({ open, handleClose }) {
                 style={{ marginBottom: 20 }}
                 placeholder="Pantry photo"
                 onChange={handleManualFileUpload}
-                value={manualFileName || ""}
               />
               <Button
                 variant="contained"
