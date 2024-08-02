@@ -12,7 +12,7 @@ import {
   incrementItemQuantity,
   storage,
 } from "@/firebase";
-import { useItems } from "@/context/ItemsContext";
+import { useItems } from "@/context/itemsContext";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import required methods
 import { doc, collection, updateDoc } from "firebase/firestore";
 import PendingIcon from "@mui/icons-material/Pending";

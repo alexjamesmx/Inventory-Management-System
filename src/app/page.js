@@ -8,7 +8,7 @@ import { NavbarCustom } from "@/components/Nav";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase";
-import { useItems } from "@/context/ItemsContext";
+import { useItems } from "@/context/itemsContext";
 
 export default function Home() {
   const [state, setState] = useState(0);

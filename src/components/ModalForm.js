@@ -32,7 +32,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { storage } from "@/firebase";
-import { useItems } from "@/context/ItemsContext";
+import { useItems } from "@/context/itemsContext";
 import { Delete } from "@mui/icons-material";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
