@@ -20,9 +20,9 @@ async function analyzeImageDescription(full_url, items, key) {
             {
               type: "text",
               text:
-                "Respond with the name of the item/product/pantry in the image, the most visible and exposed. Respond only with the item name. In case that the item's name is equal or similar to any of the following items: " +
+                "Respond with the name of the item/product/pantry in the image, choose the most visible and exposed item from the photo. Respond only with the item name. In case that the item's name is equal or similar to any of the following items: " +
                 items_string +
-                ", respond with the name of the item written the same as the reference word. If you can't identify it, respond with 'not found'. Remember just give me the word",
+                ", if not, then just respond with the name of the pantry item. If you can't identify it, respond with 'not found'. Remember just give me the word and that we are looking for pantry like items.",
             },
             {
               type: "image_url",
