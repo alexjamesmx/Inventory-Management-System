@@ -82,7 +82,13 @@ export default function Home() {
                 Pantry Inventory
               </Typography>
             </Box>
-            <Box overflow="auto" height="100%" minWidth={500}>
+            <Box
+              overflow="auto"
+              minWidth={500}
+              sx={{
+                height: "calc(100% - 3rem)",
+              }}
+            >
               <Suspense fallback={<div>Loading...</div>}>
                 <Items />
               </Suspense>
