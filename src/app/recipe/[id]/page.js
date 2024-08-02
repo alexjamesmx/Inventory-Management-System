@@ -92,7 +92,7 @@ export default function Home() {
         </Grid>
         <Box
           width={{ md: "800px", xs: "100%" }}
-          height="700px"
+          height="60%"
           overflow="hidden"
           border="2px solid #000"
           borderRadius={2}
