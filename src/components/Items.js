@@ -1,32 +1,32 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Box, Typography } from "@mui/material";
+import { useRef, useState } from "react";
+import { Box, Button, Input, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { auth, firestore } from "@/firebase";
+import { Image } from "@mui/icons-material";
 import {
-  doc,
-  updateDoc,
-  increment,
-  deleteDoc,
-  collection,
-} from "firebase/firestore";
-import { useItems } from "@/context/itemsContext";
-
-export default function Items({ fetching }) {
-  const router = useRouter();
-  const { items, setItems } = useItems();
+  auth,
+  decreaseItemQuantity,
+  deleteItem,
+  firestore,
+  incrementItemQuantity,
+  storage,
+} from "@/firebase";
+import { useItems } from "@/context/ItemsContext";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import required methods
+import { doc, collection, updateDoc } from "firebase/firestore";
+import PendingIcon from "@mui/icons-material/Pending";
+export default function Items() {
+  const { setItems, filteredItems: items, fetching } = useItems();
   const [user, setUser] = useState(auth.currentUser);
+  const [loading, setLoading] = useState(false);
+  const fileInput = useRef(null);
+  const [editImageLoading, setEditImageLoading] = useState(false);
 
   const handleAdd = async (item, index) => {
     try {
-      console.log("user", user);
-      const docRef = doc(firestore, "users", user.uid);
-      const itemsRef = collection(docRef, "items");
-      const itemRef = doc(itemsRef, item.id);
-      await updateDoc(itemRef, { quantity: increment(1) });
-
+      setLoading(true);
+      await incrementItemQuantity(user.uid, item.name);
       setItems((prevItems) => {
         const newItems = [...prevItems];
         newItems[index].quantity += 1; // Ensure single increment
@@ -34,18 +34,16 @@ export default function Items({ fetching }) {
       });
     } catch (error) {
       console.error("Error updating quantity:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleRemove = async (item, index) => {
     if (await isQuantityZero(item)) return;
-
+    setLoading(true);
     try {
-      const docRef = doc(firestore, "users", user.uid);
-      const itemsRef = collection(docRef, "items");
-      const itemRef = doc(itemsRef, item.id);
-      await updateDoc(itemRef, { quantity: increment(-1) });
-
+      await decreaseItemQuantity(user.uid, item.name);
       setItems((prevItems) => {
         const newItems = [...prevItems];
         newItems[index].quantity -= 1; // Ensure single decrement
@@ -53,22 +51,67 @@ export default function Items({ fetching }) {
       });
     } catch (error) {
       console.error("Error updating quantity:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const isQuantityZero = async (item) => {
-    if (item.quantity === 1) {
+    if (item.quantity <= 1) {
+      setLoading(true);
       try {
-        await deleteDoc(doc(firestore, "items", item.id));
-        setItems((prevItems) =>
-          prevItems.filter((prevItem) => prevItem.id !== item.id)
-        );
+        await deleteItem(user.uid, item.name);
+        setItems((prevItems) => {
+          const newItems = prevItems.filter((i) => i.name !== item.name);
+          return newItems;
+        });
         return true;
       } catch (error) {
         console.error("Error deleting item:", error);
+      } finally {
+        setLoading(false);
       }
     }
     return false;
+  };
+
+  const editAddImage = (index) => {
+    setItems((prevItems) => {
+      const newItems = [...prevItems];
+      newItems[index].isEditing = true;
+      return newItems;
+    });
+  };
+
+  const handleFileChange = async (e, item, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setEditImageLoading(true);
+    const storageRef = ref(storage, `images/${user.uid}/${item.name}`);
+    try {
+      const uploadTask = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+
+      const userDocRef = doc(firestore, "users", user.uid);
+      const itemsCollectionRef = collection(userDocRef, "items");
+      const itemDocRef = doc(itemsCollectionRef, item.name);
+
+      await updateDoc(itemDocRef, { image: downloadURL });
+      setItems((prevItems) => {
+        const newItems = [...prevItems];
+        const itemIndex = newItems.findIndex((i) => i.name === item.name);
+        if (itemIndex > -1) {
+          newItems[itemIndex].image = downloadURL;
+          newItems[itemIndex].isEditing = false;
+        }
+        return newItems;
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setEditImageLoading(false);
+    }
   };
 
   if (fetching) {
@@ -81,6 +124,7 @@ export default function Items({ fetching }) {
         alignItems={"center"}
         bgcolor={"#f0f0f0"}
         position={"relative"}
+        overflow={"auto"}
       >
         <Typography
           variant={"h4"}
@@ -118,14 +162,15 @@ export default function Items({ fetching }) {
       ) : (
         items.map((item, index) => (
           <Box
-            key={item.id}
+            key={item.name}
             width="100%"
             height="100px"
             display={"flex"}
-            justifyContent={"center"}
+            justifyContent={"space-between"}
             alignItems={"center"}
             bgcolor={"#f0f0f0"}
             position={"relative"}
+            paddingInline={2}
           >
             <Typography
               variant={"h4"}
@@ -135,6 +180,53 @@ export default function Items({ fetching }) {
             >
               {item.name}
             </Typography>
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.name}
+                width={100}
+                height={100}
+                style={{ objectFit: "cover", position: "relative", right: 120 }}
+              />
+            ) : (
+              <>
+                {editImageLoading ? (
+                  <>
+                    <PendingIcon
+                      sx={{
+                        color: "orange",
+                        width: 30,
+                        height: 30,
+                        position: "relative",
+                        right: 120,
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {item.isEditing ? (
+                      <Input
+                        type="file"
+                        ref={fileInput}
+                        accept="image/*"
+                        onChange={(e) => handleFileChange(e, item, index)}
+                      />
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        style={{ position: "relative", right: 120 }}
+                        endIcon={<Image />}
+                        onClick={() => editAddImage(index)}
+                      >
+                        Add
+                      </Button>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+
             <Box
               display={"flex"}
               justifyContent={"end"}
@@ -157,7 +249,10 @@ export default function Items({ fetching }) {
                     height: 35,
                   },
                 }}
-                onClick={() => handleAdd(item, index)}
+                onClick={() => {
+                  if (loading) return;
+                  handleAdd(item, index);
+                }}
               />
               <Typography
                 variant={"h6"}
@@ -181,7 +276,10 @@ export default function Items({ fetching }) {
                     height: 35,
                   },
                 }}
-                onClick={() => handleRemove(item, index)}
+                onClick={() => {
+                  if (loading) return;
+                  handleRemove(item, index);
+                }}
               />
             </Box>
           </Box>
