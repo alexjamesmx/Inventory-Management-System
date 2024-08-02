@@ -28,7 +28,7 @@ async function analyzeImageDescription(full_url, items, key) {
               type: "image_url",
               image_url: {
                 url: full_url,
-                detail: "low",
+                detail: "high",
               },
             },
           ],
