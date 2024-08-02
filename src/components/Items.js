@@ -12,9 +12,11 @@ import {
   deleteDoc,
   collection,
 } from "firebase/firestore";
+import { useItems } from "@/context/itemsContext";
 
-export default function Items({ items, setItems, fetching }) {
+export default function Items({ fetching }) {
   const router = useRouter();
+  const { items, setItems } = useItems();
   const [user, setUser] = useState(auth.currentUser);
 
   const handleAdd = async (item, index) => {

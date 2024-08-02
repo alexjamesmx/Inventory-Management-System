@@ -29,11 +29,12 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase";
 import { doc } from "firebase/firestore";
+import { useItems } from "@/context/itemsContext";
 
 export default function Home() {
   const [user, setUser] = useState(auth.currentUser);
   const [state, setState] = useState(0);
-  const [items, setItems] = useState([]);
+  const { items, setItems } = useItems();
   const [fetching, setFetching] = useState(true);
   const [message, setMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,32 +56,7 @@ export default function Home() {
         router.push("/login");
       }
     });
-  }, [router, refresh]);
-
-  async function getMessage() {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "Describe this image",
-            },
-            {
-              type: "iamge_url",
-              image_url: {
-                url: "https://th.bing.com/th/id/OIP.hF8_3tDhRrZvxm-j1kZwgwHaE9?rs=1&pid=ImgDetMain",
-                detail: "low",
-              },
-            },
-          ],
-        },
-      ],
-    });
-    return response.choices[0];
-  }
+  }, [router, refresh, setItems]);
 
   async function fetchItems(user) {
     const items = [];

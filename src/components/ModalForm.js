@@ -17,6 +17,7 @@ import { addDoc, collection, doc } from "firebase/firestore";
 import { firestore, auth } from "@/firebase";
 import { toast } from "react-toastify";
 import { Camera } from "react-camera-pro";
+import { useItems } from "@/context/itemsContext";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -34,14 +35,15 @@ function TabPanel(props) {
   );
 }
 
-export function ModalForm({ open, handleClose, items, setRefresh }) {
+export function ModalForm({ open, handleClose }) {
   const [itemName, setItemName] = useState("");
   const [value, setValue] = useState(0);
-  const [image, setImage] = (useState < string) | (null > null);
-  const [cameraError, setCameraError] = (useState < string) | (null > null);
-  const camera = (useRef < Camera) | (null > null);
+  const [image, setImage] = useState(null);
+  const [cameraError, setCameraError] = useState(null);
+  const camera = useRef(null);
   const [isCameraAccessible, setIsCameraAccessible] = useState(0);
   const [user, setUser] = useState(auth.currentUser);
+  const { items, setItems } = useItems();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -62,9 +64,12 @@ export function ModalForm({ open, handleClose, items, setRefresh }) {
           image: image, // Add the image URL to the document
         });
         setItemName("");
-        items.push({ name: itemName, quantity: 1, image });
         handleClose();
-        setRefresh((prev) => !prev);
+        setItems((prevItems) => [
+          ...prevItems,
+          { name: itemName, quantity: 1, image: image },
+        ]);
+
         toast.success("Item added successfully");
       }
     } catch (error) {
