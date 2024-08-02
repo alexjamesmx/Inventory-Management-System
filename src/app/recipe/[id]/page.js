@@ -19,16 +19,7 @@ export default function Home() {
   const [data, setData] = useState({});
   const [recipeName, setRecipeName] = useState("");
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      if (!user) return;
+    const fetchData = async () => {
       const userDocRef = doc(firestore, "users", user.uid);
       const recipeCollectionRef = collection(userDocRef, "recipes");
       const recipeDocRef = doc(recipeCollectionRef, "last");
@@ -45,8 +36,15 @@ export default function Home() {
         generated: generatedData?.recipe || "",
       });
       setRecipeName(recipeNameConverter(generatedData?.recipe || ""));
-    })();
-  }, [user]);
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        fetchData();
+      }
+    });
+  }, []);
 
   const recipeNameConverter = (text) => {
     const line = text.split("\n").map((line) => line.trim())[0];
