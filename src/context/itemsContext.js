@@ -14,6 +14,7 @@ export const ItemsProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   async function fetchItems(user) {
+    console.log("Fetching items...");
     const items = [];
     try {
       const uid = user.uid;
@@ -30,7 +31,7 @@ export const ItemsProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching items:", error);
     } finally {
-      console.log("Fetched items:", items);
+      console.log("Done fetching items ", items);
       setFetching(false);
     }
     return items;
