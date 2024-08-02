@@ -20,27 +20,27 @@ export default function Home() {
   const [data, setData] = useState({});
   const [recipeName, setRecipeName] = useState("");
 
-  const fetchData = async (user) => {
-    console.log("sdfd", user);
-    const userDocRef = doc(firestore, "users", user.uid);
-    const recipeCollectionRef = collection(userDocRef, "recipes");
-    const recipeDocRef = doc(recipeCollectionRef, "last");
-    const recipeDoc = await getDoc(recipeDocRef);
-    const recipeData = recipeDoc.data();
-    // Fetch the generated data from the 'generated' subcollection
-    const generatedDocRef = doc(recipeDocRef, "generated", "recipe");
-    const generatedDoc = await getDoc(generatedDocRef);
-    const generatedData = generatedDoc.data();
-    console.log("generatedDoc", generatedData);
-    console.log("recipeDoc", recipeData);
-    setData({
-      items: recipeData?.items || [],
-      generated: generatedData?.recipe || "",
-    });
-    setRecipeName(recipeNameConverter(generatedData?.recipe || ""));
-  };
-
   useEffect(() => {
+    const fetchData = async (user) => {
+      console.log("sdfd", user);
+      const userDocRef = doc(firestore, "users", user.uid);
+      const recipeCollectionRef = collection(userDocRef, "recipes");
+      const recipeDocRef = doc(recipeCollectionRef, "last");
+      const recipeDoc = await getDoc(recipeDocRef);
+      const recipeData = recipeDoc.data();
+      // Fetch the generated data from the 'generated' subcollection
+      const generatedDocRef = doc(recipeDocRef, "generated", "recipe");
+      const generatedDoc = await getDoc(generatedDocRef);
+      const generatedData = generatedDoc.data();
+      console.log("generatedDoc", generatedData);
+      console.log("recipeDoc", recipeData);
+      setData({
+        items: recipeData?.items || [],
+        generated: generatedData?.recipe || "",
+      });
+      setRecipeName(recipeNameConverter(generatedData?.recipe || ""));
+    };
+
     onAuthStateChanged(auth, (firebase_user) => {
       if (firebase_user) {
         console.log("User is signed in", firebase_user);
@@ -49,7 +49,7 @@ export default function Home() {
         router.push("/login");
       }
     });
-  }, []);
+  }, [router]);
 
   const recipeNameConverter = (text) => {
     const line = text.split("\n").map((line) => line.trim())[0];
