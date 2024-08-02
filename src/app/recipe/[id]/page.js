@@ -11,37 +11,42 @@ import { auth, firestore, getRecipeLast } from "@/firebase";
 import { useItems } from "@/context/itemsContext";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 //call to last recipe from firebase
 
 export default function Home() {
-  const [user, setUser] = useState(null);
+  const router = useRouter();
   const [data, setData] = useState({});
   const [recipeName, setRecipeName] = useState("");
-  useEffect(() => {
-    const fetchData = async () => {
-      const userDocRef = doc(firestore, "users", user.uid);
-      const recipeCollectionRef = collection(userDocRef, "recipes");
-      const recipeDocRef = doc(recipeCollectionRef, "last");
-      const recipeDoc = await getDoc(recipeDocRef);
-      const recipeData = recipeDoc.data();
-      // Fetch the generated data from the 'generated' subcollection
-      const generatedDocRef = doc(recipeDocRef, "generated", "recipe");
-      const generatedDoc = await getDoc(generatedDocRef);
-      const generatedData = generatedDoc.data();
-      console.log("generatedDoc", generatedData);
-      console.log("recipeDoc", recipeData);
-      setData({
-        items: recipeData?.items || [],
-        generated: generatedData?.recipe || "",
-      });
-      setRecipeName(recipeNameConverter(generatedData?.recipe || ""));
-    };
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-        fetchData();
+  const fetchData = async (user) => {
+    console.log("sdfd", user);
+    const userDocRef = doc(firestore, "users", user.uid);
+    const recipeCollectionRef = collection(userDocRef, "recipes");
+    const recipeDocRef = doc(recipeCollectionRef, "last");
+    const recipeDoc = await getDoc(recipeDocRef);
+    const recipeData = recipeDoc.data();
+    // Fetch the generated data from the 'generated' subcollection
+    const generatedDocRef = doc(recipeDocRef, "generated", "recipe");
+    const generatedDoc = await getDoc(generatedDocRef);
+    const generatedData = generatedDoc.data();
+    console.log("generatedDoc", generatedData);
+    console.log("recipeDoc", recipeData);
+    setData({
+      items: recipeData?.items || [],
+      generated: generatedData?.recipe || "",
+    });
+    setRecipeName(recipeNameConverter(generatedData?.recipe || ""));
+  };
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (firebase_user) => {
+      if (firebase_user) {
+        console.log("User is signed in", firebase_user);
+        fetchData(firebase_user);
+      } else {
+        router.push("/login");
       }
     });
   }, []);
