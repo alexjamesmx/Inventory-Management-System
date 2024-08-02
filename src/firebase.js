@@ -142,6 +142,22 @@ async function decreaseItemQuantity(user_uid, name) {
     console.error("Error decrementing item quantity:", error);
   }
 }
+
+async function getRecipeLast(user_uid) {
+  try {
+    const userDocRef = doc(firestore, "users", user_uid);
+    const recipeCollectionRef = collection(userDocRef, "recipes");
+    const recipeDocRef = doc(recipeCollectionRef, "last");
+    const recipeDoc = await getDoc(recipeDocRef);
+    if (recipeDoc.exists()) {
+      return recipeDoc.data();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting last recipe:", error);
+  }
+}
 export {
   firestore,
   auth,
@@ -154,4 +170,5 @@ export {
   incrementItemQuantity,
   decreaseItemQuantity,
   itemAlreadyRegistered,
+  getRecipeLast,
 };

@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import {
   AppBar,
@@ -24,6 +25,7 @@ import { onAuthStateChanged } from "firebase/auth";
 export function NavbarCustom() {
   const router = useRouter();
   const [state, setState] = useState(0);
+
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -51,12 +53,24 @@ export function NavbarCustom() {
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1, cursor: "pointer" }}
+            sx={{ cursor: "pointer" }}
             onClick={() => {
               router.push("/");
             }}
           >
             Home
+          </Typography>
+
+          <Typography
+            variant="h6"
+            component="div"
+            marginLeft={4}
+            sx={{ flexGrow: 1, cursor: "pointer" }}
+            onClick={() => {
+              router.push("/recipe/" + auth.currentUser.uid);
+            }}
+          >
+            Recipe
           </Typography>
 
           {state !== 0 && (

@@ -1,5 +1,5 @@
 "use client";
-import { Box, Grid, Typography, TextField } from "@mui/material";
+import { Box, Grid, Typography, TextField, Button } from "@mui/material";
 import { Add } from "@/components/Add";
 import Items from "@/components/Items";
 import { Suspense, useEffect, useState } from "react";
@@ -9,11 +9,14 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase";
 import { useItems } from "@/context/itemsContext";
-
+import NotesIcon from "@mui/icons-material/Notes";
+import { ModalRecipe } from "@/components/ModalRecipe";
 export default function Home() {
   const [state, setState] = useState(0);
   const { setSearchQuery, searchQuery } = useItems();
-
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const router = useRouter();
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -50,6 +53,19 @@ export default function Home() {
             <Grid item xs={12} md="auto">
               <Add />
             </Grid>
+
+            <Grid item xs={12} md="auto">
+              <Button
+                variant={"contained"}
+                color={"secondary"}
+                endIcon={<NotesIcon />}
+                style={{ marginBottom: 20 }}
+                onClick={handleOpen}
+              >
+                Generate Recipe
+              </Button>
+            </Grid>
+
             <Grid item xs={12} md={6}>
               <TextField
                 type="search"
@@ -95,6 +111,7 @@ export default function Home() {
             </Box>
           </Box>
         </Box>
+        <ModalRecipe open={open} handleClose={handleClose} />;
       </>
     );
   }

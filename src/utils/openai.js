@@ -3,7 +3,8 @@ import * as mobilenet from "@tensorflow-models/mobilenet";
 import "@tensorflow/tfjs";
 
 const openai = new OpenAI({
-  apiKey: "sk-proj-hawQpXIoFa2elx7goPCFT3BlbkFJboWLGVI9kZGPpDdmIXRl",
+  apiKey:
+    "sk-PNBzOqNrHtcqKs2ucg81LUvD0N2louy2IslYQjdTU9T3BlbkFJGiyR09XCqfG6jYzjOKIoDDTGDiu37AVZruDI-9OXkA",
   dangerouslyAllowBrowser: true,
 });
 
@@ -51,4 +52,35 @@ async function analyzeImageDescription(full_url, items) {
   }
 }
 
-export { analyzeImageDescription };
+async function generateRecipe(items) {
+  const pantry = items
+    .map((item) => item.name + ", " + item.quantity)
+    .join(", ");
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text:
+                "Generate a recipe with the following items: " +
+                pantry +
+                ". Make sure to repond with the following structure: recipe name, ingredients and instructions.",
+            },
+          ],
+        },
+      ],
+      max_tokens: 300,
+    });
+
+    return { message: response.choices[0].message.content };
+  } catch (error) {
+    return { error: error };
+  }
+}
+
+export { analyzeImageDescription, generateRecipe };
