@@ -15,7 +15,7 @@ import { collection, doc, getDoc } from "firebase/firestore";
 //call to last recipe from firebase
 
 export default function Home() {
-  const [user, setUser] = useState(auth.currentUser);
+  const [user, setUser] = useState(null);
   const [data, setData] = useState({});
   const [recipeName, setRecipeName] = useState("");
   useEffect(() => {

@@ -103,6 +103,7 @@ export function ModalRecipe({ open, handleClose }) {
         await setDoc(generatedDocRef, { recipe: gptRes.message });
         console.log("GPT Response: ", gptRes);
         setGenerationState(2);
+        beforeClose();
         router.push("/recipe/" + user.uid);
       } catch (error) {
         console.error("Error adding recipes to Firestore: ", error);
