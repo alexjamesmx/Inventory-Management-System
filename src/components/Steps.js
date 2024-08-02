@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 export function RecipeSteps({ items, generated }) {
   const recipeDataConverter = (text) => {
     const lines = text.split("\n").map((line) => line.trim());
+
+    const recipeNameIndex = lines.findIndex((line) =>
+      line.toLowerCase().includes("Recipe Name:")
+    );
+
     const ingredientsIndex = lines.findIndex((line) =>
       line.toLowerCase().includes("ingredients:")
     );
@@ -26,8 +31,14 @@ export function RecipeSteps({ items, generated }) {
         }
       }
     }
+    let recipeName;
 
-    return { ingredients, instructions };
+    if (recipeNameIndex !== -1) {
+      recipeName = lines[recipeNameIndex].split(":")[1].trim();
+      ingredients.unshift(recipeName);
+    }
+
+    return { ingredients, instructions, recipeName };
   };
 
   if (!items) {

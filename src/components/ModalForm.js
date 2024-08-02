@@ -175,7 +175,11 @@ export function ModalForm({ open, handleClose }) {
       console.log("Image uploaded: ", imageUrl);
 
       // Analyze image description
-      let res = await analyzeImageDescription(imageUrl, items);
+      let res = await analyzeImageDescription(
+        imageUrl,
+        items,
+        process.env.NEXT_PUBLIC_OPENAI_API_KEY
+      );
       console.log("Image description analysis: ", res);
 
       if (res.error) {

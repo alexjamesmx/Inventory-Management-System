@@ -2,13 +2,11 @@ import { OpenAI } from "openai";
 import * as mobilenet from "@tensorflow-models/mobilenet";
 import "@tensorflow/tfjs";
 
-const openai = new OpenAI({
-  apiKey:
-    "sk-PNBzOqNrHtcqKs2ucg81LUvD0N2louy2IslYQjdTU9T3BlbkFJGiyR09XCqfG6jYzjOKIoDDTGDiu37AVZruDI-9OXkA",
-  dangerouslyAllowBrowser: true,
-});
-
-async function analyzeImageDescription(full_url, items) {
+async function analyzeImageDescription(full_url, items, key) {
+  const openai = new OpenAI({
+    apiKey: key,
+    dangerouslyAllowBrowser: true,
+  });
   //define a string with all the items on the list
   let items_string = items.map((item) => item.name).join(", ");
 
@@ -52,7 +50,11 @@ async function analyzeImageDescription(full_url, items) {
   }
 }
 
-async function generateRecipe(items) {
+async function generateRecipe(items, key) {
+  const openai = new OpenAI({
+    apiKey: key,
+    dangerouslyAllowBrowser: true,
+  });
   const pantry = items
     .map((item) => item.name + ", " + item.quantity)
     .join(", ");

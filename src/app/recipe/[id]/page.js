@@ -17,6 +17,7 @@ import { collection, doc, getDoc } from "firebase/firestore";
 export default function Home() {
   const [user, setUser] = useState(auth.currentUser);
   const [data, setData] = useState({});
+  const [recipeName, setRecipeName] = useState("");
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -45,9 +46,16 @@ export default function Home() {
         items: recipeData.items,
         generated: generatedData.recipe,
       });
+      setRecipeName(recipeNameConverter(generatedData.recipe));
     })();
   }, [user]);
 
+  const recipeNameConverter = (text) => {
+    const line = text.split("\n").map((line) => line.trim())[0];
+    const recipeNameIndex = line.toLowerCase().indexOf("recipe name:");
+    let recipeName = line.substring(recipeNameIndex + 12).trim();
+    return recipeName;
+  };
   return (
     <>
       <NavbarCustom />
@@ -101,7 +109,7 @@ export default function Home() {
               padding={2}
               sx={{ fontSize: { xs: "1.5rem", md: "2rem" } }}
             >
-              Pantry Recipe
+              {recipeName}
             </Typography>
           </Box>
           <Box

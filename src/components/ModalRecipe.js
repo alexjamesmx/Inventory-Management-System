@@ -81,7 +81,11 @@ export function ModalRecipe({ open, handleClose }) {
 
         console.log("Recipes added to Firestore successfully!");
         setGenerationState(1);
-        const gptRes = await generateRecipe(selected);
+
+        const gptRes = await generateRecipe(
+          selected,
+          process.env.NEXT_PUBLIC_OPENAI_API_KEY
+        );
 
         if (gptRes?.error) {
           console.error("Error generating recipe: ", gptRes.error);
@@ -97,13 +101,12 @@ export function ModalRecipe({ open, handleClose }) {
         );
         const generatedDocRef = doc(generatedCollectionRef, "recipe");
         await setDoc(generatedDocRef, { recipe: gptRes.message });
-        beforeClose();
-
         console.log("GPT Response: ", gptRes);
         router.push("/recipe/" + user.uid);
       } catch (error) {
         console.error("Error adding recipes to Firestore: ", error);
         toast.error("Error adding recipes to Firestore");
+        beforeClose();
       } finally {
         setLoading(false);
       }
