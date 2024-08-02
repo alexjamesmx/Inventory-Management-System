@@ -45,8 +45,8 @@ export function RecipeSteps({ items, generated }) {
     return <div>Loading...</div>;
   }
 
-  if (items.length === 0) {
-    return <div>No items found.</div>;
+  if (items.length === 0 || generated === "") {
+    return <div>First Generate a recipe!.</div>;
   }
 
   const parsedData = recipeDataConverter(generated);

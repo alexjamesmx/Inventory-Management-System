@@ -34,19 +34,17 @@ export default function Home() {
       const recipeDocRef = doc(recipeCollectionRef, "last");
       const recipeDoc = await getDoc(recipeDocRef);
       const recipeData = recipeDoc.data();
-
-      console.log("recipeDoc", recipeData.items);
-
       // Fetch the generated data from the 'generated' subcollection
       const generatedDocRef = doc(recipeDocRef, "generated", "recipe");
       const generatedDoc = await getDoc(generatedDocRef);
       const generatedData = generatedDoc.data();
       console.log("generatedDoc", generatedData);
+      console.log("recipeDoc", recipeData);
       setData({
-        items: recipeData.items,
-        generated: generatedData.recipe,
+        items: recipeData?.items || [],
+        generated: generatedData?.recipe || "",
       });
-      setRecipeName(recipeNameConverter(generatedData.recipe));
+      setRecipeName(recipeNameConverter(generatedData?.recipe || ""));
     })();
   }, [user]);
 

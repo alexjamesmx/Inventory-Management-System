@@ -80,6 +80,7 @@ export function NavbarCustom() {
                 <Button
                   color="inherit"
                   onClick={() => {
+                    localStorage.removeItem("user");
                     auth.signOut();
                   }}
                 >
