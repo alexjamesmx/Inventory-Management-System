@@ -33,7 +33,7 @@ import {
 } from "firebase/storage";
 import { storage } from "@/firebase";
 import { useItems } from "@/context/itemsContext";
-import { Delete } from "@mui/icons-material";
+import HourglassFullIcon from "@mui/icons-material/HourglassFull";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -76,7 +76,7 @@ export function ModalForm({ open, handleClose }) {
   const [user, setUser] = useState(auth.currentUser);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [manualFile, setManualFile] = useState(null);
-  const [manualFileName, setManualFileName] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const handleChange = (event, newValue) => {
     setValue(newValue);
     if (newValue === 1) {
@@ -86,6 +86,7 @@ export function ModalForm({ open, handleClose }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
     try {
       const alreadyExists = await itemAlreadyRegistered(user.uid, itemName);
       console.log("alreadyExists: ", alreadyExists);
@@ -130,6 +131,8 @@ export function ModalForm({ open, handleClose }) {
     } catch (error) {
       console.error("Error adding item:", error);
       toast.error("Failed to add item");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -147,8 +150,11 @@ export function ModalForm({ open, handleClose }) {
         console.log("Webcam is accessible");
         return 1;
       })
-      .catch(() => {
+      .catch((err) => {
         console.log("Webcam is not accessible");
+        toast.error(
+          "Cam is not accessible. Grant permission to use the camera."
+        );
         return 2;
       });
   }
@@ -266,7 +272,7 @@ export function ModalForm({ open, handleClose }) {
       };
       checkCameraAccess();
     }
-  }, [value]);
+  }, [value, isCameraAccessible]);
 
   useEffect(() => {
     console.log("photo status", photoStatus);
@@ -497,6 +503,10 @@ export function ModalForm({ open, handleClose }) {
               Add Item
             </Typography>
             <FormControl fullWidth>
+              <Typography variant="h9" gutterBottom>
+                Required *
+              </Typography>
+
               <TextField
                 id="item"
                 label="Item"
@@ -506,6 +516,9 @@ export function ModalForm({ open, handleClose }) {
                 style={{ marginBottom: 20 }}
                 required
               />
+              <Typography variant="h9" gutterBottom>
+                Optional
+              </Typography>
               <Input
                 type="file"
                 accept="image/*"
@@ -521,6 +534,8 @@ export function ModalForm({ open, handleClose }) {
                 color="primary"
                 type="submit"
                 style={{ marginBottom: 20 }}
+                disabled={isLoading}
+                endIcon={isLoading ? <HourglassFullIcon /> : null}
               >
                 Add
               </Button>
