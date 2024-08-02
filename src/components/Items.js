@@ -171,6 +171,7 @@ export default function Items() {
             bgcolor={"#f0f0f0"}
             position={"relative"}
             paddingInline={2}
+            marginBottom={2}
           >
             <Typography
               variant={"h4"}

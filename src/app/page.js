@@ -37,7 +37,7 @@ export default function Home() {
           display={"flex"}
           alignItems={"center"}
           flexDirection={"column"}
-          marginTop={8}
+          marginTop={4}
           paddingX={2}
         >
           <Grid
@@ -82,7 +82,7 @@ export default function Home() {
                 Pantry Inventory
               </Typography>
             </Box>
-            <Box overflow="auto" height="450px" minWidth={500}>
+            <Box overflow="auto" height="100%" minWidth={500}>
               <Suspense fallback={<div>Loading...</div>}>
                 <Items />
               </Suspense>
