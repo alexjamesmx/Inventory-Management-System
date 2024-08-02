@@ -102,6 +102,7 @@ export function ModalRecipe({ open, handleClose }) {
         const generatedDocRef = doc(generatedCollectionRef, "recipe");
         await setDoc(generatedDocRef, { recipe: gptRes.message });
         console.log("GPT Response: ", gptRes);
+        setGenerationState(2);
         router.push("/recipe/" + user.uid);
       } catch (error) {
         console.error("Error adding recipes to Firestore: ", error);
@@ -242,8 +243,14 @@ export function ModalRecipe({ open, handleClose }) {
               </Box>
             ))}
           </Stack>
-          {generationState === 1 ? (
-            <>Working... Please wait</>
+          {generationState !== 0 ? (
+            <>
+              {generationState === 1 ? (
+                <div>Generating...</div>
+              ) : (
+                <div>Done! you will be redirected.</div>
+              )}
+            </>
           ) : (
             <Button
               variant="contained"
