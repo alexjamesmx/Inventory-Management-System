@@ -97,12 +97,14 @@ async function deleteItem(user_uid, name) {
 
 async function incrementItemQuantity(user_uid, itemName) {
   try {
+    console.log("incrementing item quantity: ", itemName, " : ", user_uid);
     const userDocRef = doc(firestore, "users", user_uid);
     const itemsCollectionRef = collection(userDocRef, "items");
     const itemDocRef = doc(itemsCollectionRef, itemName);
     // Use a transaction to ensure that the increment operation is atomic
     await runTransaction(firestore, async (transaction) => {
       const itemDoc = await transaction.get(itemDocRef);
+      console.log("itemDoc: ", itemDoc);
       if (itemDoc.exists()) {
         const newQuantity = itemDoc.data().quantity + 1;
         transaction.update(itemDocRef, { quantity: newQuantity });

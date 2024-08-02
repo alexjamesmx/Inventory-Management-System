@@ -187,6 +187,9 @@ export default function Items() {
                 width={100}
                 height={100}
                 style={{ objectFit: "cover", position: "relative", right: 120 }}
+                onClick={() => {
+                  window.open(item.image, "_blank");
+                }}
               />
             ) : (
               <>
@@ -208,19 +211,41 @@ export default function Items() {
                       <Input
                         type="file"
                         ref={fileInput}
-                        accept="image/*"
+                        accept="image/png, image/jpeg, image/jpg"
                         onChange={(e) => handleFileChange(e, item, index)}
                       />
                     ) : (
-                      <Button
-                        variant="contained"
+                      <Image
+                        style={{
+                          position: "relative",
+                          right: 120,
+                          cursor: "pointer",
+                          borderRadius: 50,
+                          backgroundColor: "white",
+                          padding: 5,
+                        }}
+                        sx={{
+                          width: 25,
+                          height: 25,
+                          "&:hover": {
+                            color: "darkgreen",
+                            width: 45,
+                            height: 45,
+                          },
+                          transition:
+                            "color 0.3s ease, width 0.3s ease, height 0.3s ease",
+                        }}
                         color="primary"
-                        style={{ position: "relative", right: 120 }}
-                        endIcon={<Image />}
                         onClick={() => editAddImage(index)}
-                      >
-                        Add
-                      </Button>
+                        alt="Add Image"
+                      />
+                      // <Button
+                      //   variant="contained"
+                      //   color="primary"
+                      //   style={{ position: "relative", right: 120 }}
+                      //   endIcon={<Image />}
+                      //   onClick={() => editAddImage(index)}
+                      // ></Button>
                     )}
                   </>
                 )}

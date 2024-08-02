@@ -17,7 +17,7 @@ export function Add() {
         style={{ marginBottom: 20 }}
         onClick={handleOpen}
       >
-        Add
+        New Item
       </Button>
       <ModalForm open={open} handleClose={handleClose} />
     </>

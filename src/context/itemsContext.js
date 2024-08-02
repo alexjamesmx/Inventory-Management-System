@@ -1,5 +1,6 @@
 "use client";
 import { auth, firestore } from "@/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDocs } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -10,8 +11,8 @@ export const ItemsProvider = ({ children }) => {
   const [filteredItems, setFilteredItems] = useState([]);
   const [fetching, setFetching] = useState(true);
   const [refresh, setRefresh] = useState(false);
-  const user = auth.currentUser;
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState(auth.currentUser);
 
   async function fetchItems(user) {
     console.log("Fetching items...");
@@ -38,11 +39,14 @@ export const ItemsProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    if (!user) return;
-
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        fetchItems(user).then((fetchedItems) => setItems(fetchedItems));
+        setUser(user);
+      }
+    });
     // Fetch items whenever refresh is toggled or user changes
-    fetchItems(user).then((fetchedItems) => setItems(fetchedItems));
-  }, [refresh, user]); // Only depend on refresh and user
+  }, [refresh]); // Only depend on refresh and user
 
   useEffect(() => {
     // Filter items whenever items or searchQuery changes
@@ -54,6 +58,8 @@ export const ItemsProvider = ({ children }) => {
       )
     );
   }, [items, searchQuery]);
+
+  console.log("Whats going ong ");
 
   return (
     <ItemsContext.Provider

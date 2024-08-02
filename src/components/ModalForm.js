@@ -76,7 +76,7 @@ export function ModalForm({ open, handleClose }) {
   const [user, setUser] = useState(auth.currentUser);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [manualFile, setManualFile] = useState(null);
-
+  const [manualFileName, setManualFileName] = useState(null);
   const handleChange = (event, newValue) => {
     setValue(newValue);
     if (newValue === 1) {
@@ -502,19 +502,17 @@ export function ModalForm({ open, handleClose }) {
                 style={{ marginBottom: 20 }}
                 required
               />
-              <Box display={"flex"}>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  id="photo"
-                  label="Photo"
-                  variant="outlined"
-                  style={{ marginBottom: 20 }}
-                  placeholder="Pantry photo"
-                  onChange={handleManualFileUpload}
-                />
-                <Delete />
-              </Box>
+              <Input
+                type="file"
+                accept="image/*"
+                id="photo"
+                label="Photo"
+                variant="outlined"
+                style={{ marginBottom: 20 }}
+                placeholder="Pantry photo"
+                onChange={handleManualFileUpload}
+                value={manualFileName || ""}
+              />
               <Button
                 variant="contained"
                 color="primary"

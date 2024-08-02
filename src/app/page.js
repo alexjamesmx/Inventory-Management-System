@@ -1,5 +1,5 @@
 "use client";
-import { Box, Stack, Typography, TextField } from "@mui/material";
+import { Box, Grid, Typography, TextField } from "@mui/material";
 import { Add } from "@/components/Add";
 import Items from "@/components/Items";
 import { Suspense, useEffect, useState } from "react";
@@ -12,7 +12,7 @@ import { useItems } from "@/context/itemsContext";
 
 export default function Home() {
   const [state, setState] = useState(0);
-  const { items, setItems, fetching, setSearchQuery, searchQuery } = useItems();
+  const { setSearchQuery, searchQuery } = useItems();
 
   const router = useRouter();
   useEffect(() => {
@@ -38,52 +38,60 @@ export default function Home() {
           alignItems={"center"}
           flexDirection={"column"}
           marginTop={8}
+          paddingX={2}
         >
-          <Box
-            display={"flex"}
-            justifyContent={"space-between"}
-            width="800px"
-            flexDirection={"row"}
-            marginBottom={2}
-            gap={4}
+          <Grid
+            container
+            spacing={2}
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ width: { xs: "100%", md: "800px" }, marginBottom: 2 }}
           >
-            <Add />
-            <TextField
-              type="search"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ marginBottom: 20, width: "300px" }}
-            />{" "}
-          </Box>
+            <Grid item xs={12} md="auto">
+              <Add />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                type="search"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                fullWidth
+              />
+            </Grid>
+          </Grid>
           <Box
-            width="800px"
+            width={{ md: "800px", xs: "100%" }}
             height="500px"
-            overflow={"hidden"}
-            border={"2px solid #000"}
+            overflow="hidden"
+            border="2px solid #000"
             borderRadius={2}
+            sx={{
+              overflowX: "auto",
+            }}
           >
-            <Box bgcolor={"#1976d2"}>
+            <Box bgcolor="#1976d2" minWidth={500}>
               <Typography
-                variant={"h2"}
-                color={"#fff"}
-                textAlign={"center"}
-                fontWeight={"bold"}
+                variant="h2"
+                color="#fff"
+                textAlign="center"
+                fontWeight="bold"
                 padding={2}
+                sx={{ fontSize: { xs: "1.5rem", md: "2rem" } }}
               >
                 Pantry Inventory
               </Typography>
             </Box>
-            <Box overflow={"auto"} height={"400px"}>
-              <Stack spacing={2}>
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Items />
-                </Suspense>
-              </Stack>
+            <Box overflow="auto" height="450px" minWidth={500}>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Items />
+              </Suspense>
             </Box>
           </Box>
         </Box>
       </>
     );
   }
+
+  return null;
 }
