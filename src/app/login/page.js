@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { GoogleAuthProvider } from "firebase/auth";
 import { auth, userExists, registerNewUser, getUserInfo } from "@/firebase";
 import { signInWithPopup } from "firebase/auth";
@@ -80,7 +80,14 @@ export default function Login() {
         justifyContent="center"
         alignItems="center"
         height="100vh"
+        flexDirection={"column"}
+        gap={"2rem"}
       >
+        <Typography variant="h4" gutterBottom>
+          Welcome to your inventory
+          <Typography variant="caption">&nbsp; Made by Alexjamesmx</Typography>
+        </Typography>
+
         <Button
           variant="contained"
           onClick={handleOnClick}
